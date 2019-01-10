@@ -1,0 +1,32 @@
+language: julia
+os:
+- linux
+julia:
+- 1.0
+notifications:
+  email: false
+git:
+  depth: 99999999
+cache:
+  timeout: 1000
+  directories:
+  - downloads
+env:
+  global:
+  - BINARYBUILDER_DOWNLOADS_CACHE=downloads
+  - BINARYBUILDER_AUTOMATIC_APPLE=true
+sudo: required
+before_script:
+- julia -e 'using Pkg; pkg"add BinaryProvider"; pkg"add BinaryBuilder#master"; Pkg.build()'
+script:
+- julia build_tarballs.jl
+deploy:
+  provider: releases
+  api_key:
+    secure: dXcsdiMPtiFJhWIoh2A/vsaCRG7QuuTJ24sbgQx2ty2A0YE6WfLtYivlpYfDDns8hetPDUPaf0/6AISf+MU+JOV0p/YqYPbXxXA6EAPlZ/DA6YENqHVYS1zMiKsyK4AUE7rP5LGxaFkidHLmJxV3zV6N/bZP1WKnSmwxQXqWQp4dcuqxnSVTqrIJBXsJxkIGEOjK/EgAqMEmEVPGa7wjZTCW2Dp9dtUOt029WezjIMQi0t44CdTrMJIk0wTGbwG8QoPqjlr2evUXxjnI720XBIivDOFw53BRC8mtn8aGKmUo7ZSvVJMKOGiqhD//tXAKacg4yHNIvbVxEnsx31w7ssV+EyUiJKP28SNU3yazIwDMMi8mv6QwdJPF96NFcfX1Gbi7SPxNadN9vWTh7L4t3hov0nHodCETApKOQvyMehw9buKrw5WT6yMO/prQSVeRq7ziFL6OAf/poefkyppmYJBf030LyYTSLI2YgsB7hgRzPO5x0SE80UN//zcXvHfXC/ub70qfOW+74yrT2P7gIYesGXrNsArjzdWEh6KRuJTevK3q0ABXAc4Z8bG6+Dnaih8jhfL5rvUw9hwFMZIfUlMdMzlQOT3ex6mCHOQdjW/jR/753Q/7LHBas+IUIU5J6WOMqUDiLt9YSmTIZfpDe8pm4MpckzSRK2Q6pmb9pL8=
+  file_glob: true
+  file: products/*
+  skip_cleanup: true
+  on:
+    repo: abelsiqueira/OpenBLASBuilder
+    tags: true
