@@ -75,32 +75,6 @@ for bits in 32 64; do
 
     # Install the library
     make "${flags[@]}" "PREFIX=$prefix" install
-
-    # Force the library to be named the same as in Julia-land.
-    # Move things around, fix symlinks, and update install names/SONAMEs.
-    ls -la ${prefix}/lib
-    for f in ${prefix}/lib/libopenblas*p-r0*; do
-        name=${LIBPREFIX}.0.${f#*.}
-
-        # Move this file to a julia-compatible name
-        mv -v ${f} ${prefix}/lib/${name}
-
-        # If there were links that are now broken, fix 'em up
-        for l in $(find ${prefix}/lib -xtype l); do
-            if [[ $(basename $(readlink ${l})) == $(basename ${f}) ]]; then
-                ln -vsf ${name} ${l}
-            fi
-        done
-
-        # If this file was a .so or .dylib, set its SONAME/install name
-        if [[ ${f} == *.so.* ]] || [[ ${f} == *.dylib ]]; then 
-            if [[ ${target} == *linux* ]] || [[ ${target} == *freebsd* ]]; then
-                patchelf --set-soname ${name} ${prefix}/lib/${name}
-            elif [[ ${target} == *apple* ]]; then
-                install_name_tool -id ${name} ${prefix}/lib/${name}
-            fi
-        fi
-    done
 done
 """
 
